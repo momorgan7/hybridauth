@@ -2,6 +2,7 @@
 namespace Hybridauth\Entity\Facebook;
 
 use \Hybridauth\Http\Request;
+use \Hybridauth\Entity\Facebook\Venue;
 
 class Event extends \Hybridauth\Entity\Entity
 {
@@ -11,12 +12,8 @@ class Event extends \Hybridauth\Entity\Entity
     protected $start_time = null;
     protected $end_time = null;
     protected $location = null;
-    protected $street = null;
-    protected $zip = null;
-    protected $country = null;
-    protected $latitude = null;
-    protected $longitude = null;
     protected $ticketURI = null;
+    protected $venue = null;
 
     function getDate() {
         return $this->date;
@@ -43,27 +40,39 @@ class Event extends \Hybridauth\Entity\Entity
     }
 
     function getStreet() {
-        return $this->street;
+        return is_null($this->venue) ? null : $this->venue->getStreet();
+    }
+
+    function getCity() {
+        return is_null($this->venue) ? null : $this->venue->getCity();
+    }
+
+    function getState() {
+        return is_null($this->venue) ? null : $this->venue->getState();
     }
 
     function getZip() {
-        return $this->zip;
+        return is_null($this->venue) ? null : $this->venue->getZip();
     }
 
     function getCountry() {
-        return $this->country;
+        return is_null($this->venue) ? null : $this->venue->getCountry();
     }
 
     function getLatitude() {
-        return $this->latitude;
+        return is_null($this->venue) ? null : $this->venue->getLatitude();
     }
 
     function getLongitude() {
-        return $this->longitude;
+        return is_null($this->venue) ? null : $this->venue->getLongitude();
     }
 
     function getTicketURI() {
         return $this->ticketURI;
+    }
+
+    function getVenue() {
+        return $this->venue;
     }
 
     function setDate($date) {
@@ -79,11 +88,19 @@ class Event extends \Hybridauth\Entity\Entity
     }
 
     function setStartTime($start_time) {
-        $this->start_time = static::formatDate($start_time);
+        if(is_null($start_time)) {
+            $this->start_time = null;
+        } else {
+            $this->start_time = is_numeric($start_time) ? $start_time : strtotime($start_time);
+        }
     }
 
     function setEndTime($end_time) {
-        $this->end_time = static::formatDate($end_time);
+        if(is_null($end_time)) {
+            $this->end_time = null;
+        } else {
+            $this->end_time = is_numeric($end_time) ? $end_time : strtotime($end_time);
+        }
     }
 
     function setLocation($location) {
@@ -91,27 +108,46 @@ class Event extends \Hybridauth\Entity\Entity
     }
 
     function setStreet($street) {
-        $this->street = $street;
+        $this->getOrCreateVenue()->setStreet($street);
+    }
+
+    function setCity($city) {
+        $this->getOrCreateVenue()->setCity($city);
+    }
+
+    function setState($state) {
+        $this->getOrCreateVenue()->setStreet($state);
     }
 
     function setZip($zip) {
-        $this->zip = $zip;
+        $this->getOrCreateVenue()->setZip($zip);
     }
 
     function setCountry($country) {
-        $this->country = $country;
+        $this->getOrCreateVenue()->setCountry($country);
     }
 
     function setLatitude($latitude) {
-        $this->latitude = $latitude;
+        $this->getOrCreateVenue()->setLatitude($latitude);
     }
 
     function setLongitude($longitude) {
-        $this->longitude = $longitude;
+        $this->getOrCreateVenue()->setLongitude($longitude);
     }
 
     function setTicketURI($ticketURI) {
         $this->ticketURI = $ticketURI;
+    }
+
+    function setVenue($venue) {
+        $this->venue = $venue;
+    }
+
+    private function getOrCreateVenue() {
+        if(is_null($this->venue)) {
+            $this->venue = new Venue($this->getAdapter());
+        }
+        return $this->venue;
     }
 
     function delete() {
@@ -124,12 +160,7 @@ class Event extends \Hybridauth\Entity\Entity
         return true;
     }
 
-    private static function formatDate($date) {
-        if(is_null($date)) return null;
-        if(is_string($date))
-        {
-            $date = strtotime($date);
-        }
+    protected static function formatDate($date) {
         return date(\DateTime::ISO8601, $date);
     }
 
@@ -143,13 +174,20 @@ class Event extends \Hybridauth\Entity\Entity
         $event->setLocation    ( static::parser( 'location',$response )    );
         $event->setTicketURI   ( static::parser( 'ticket_uri',$response )  );
         if(property_exists($response, 'venue')) {
-            $venue = $response->venue;
-            $event->setStreet    ( static::parser( 'street',$venue )    );
-            $event->setZip       ( static::parser( 'zip',$venue )       );
-            $event->setCountry   ( static::parser( 'country',$venue )   );
-            $event->setLatitude  ( static::parser( 'latitude',$venue )  );
-            $event->setLongitude ( static::parser( 'longitude',$venue ) );
+            $event->venue = Venue::generateFromResponse($response->venue,$adapter);
         }
         return $event;
+    }
+
+    public static function generatePostDataFromEntity($event) {
+        $return = parent::generatePostDataFromEntity($event);
+        if(!is_null($x = $event->getName()))        $return['name']         = $x;
+        if(!is_null($x = $event->getDescription())) $return['description']  = $x;
+        if(!is_null($x = $event->getStartTime()))   $return['start_time']   = static::formatDate($x);
+        if(!is_null($x = $event->getEndTime()))     $return['end_time']     = static::formatDate($x);
+        if(!is_null($x = $event->getLocation()))    $return['location']     = $x;
+        if(!is_null($x = $event->getVenue()))       $return['venue']        = $x->generatePostData();
+        if(!is_null($x = $event->getTicketURI()))   $return['ticket_uri']   = $x;
+        return $return;
     }
 }

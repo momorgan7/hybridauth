@@ -55,4 +55,13 @@ class Entity
     public static function generateFromResponse($response,$adapter) {
         return new static($adapter);
     }
+
+    public static function generatePostDataFromEntity($entity) {
+        return array();
+    }
+
+    public function generatePostData() {
+        $class = get_class($this);
+        return $class::generatePostDataFromEntity($this);
+    }
 }
