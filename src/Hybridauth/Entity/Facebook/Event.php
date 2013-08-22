@@ -167,11 +167,11 @@ class Event extends \Hybridauth\Entity\Entity
         $this->privacy = $privacy;
     }
 
-    function attachImage($file) {
-        if(!is_readable($file)) {
+    function setImage($image) {
+        if(!is_readable($image)) {
             return false;
         }
-        $this->file = realpath($file);
+        $this->image = realpath($image);
     }
 
     private function getOrCreateVenue() {
