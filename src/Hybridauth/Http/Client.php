@@ -105,4 +105,8 @@ class Client implements ClientInterface
 	{
 		return $this->response->getErrorCode();
 	}
+
+	function setResponse($response) {
+		$this->response = $response;
+	}
 }

@@ -14,13 +14,15 @@ class AdapterFactory
 {
 	protected $hybridauthConfig = null;
 	protected $storage = null;
+	protected $cache = null;
 
 	// --------------------------------------------------------------------
 
-	function __construct( $config, StorageInterface $storage = null )
+	function __construct( $config, StorageInterface $storage = null,StorageInterface $cache = null )
 	{
 		$this->hybridauthConfig = $config;
 		$this->storage          = $storage;
+		$this->cache          = $cache;
 	}
 
 	// --------------------------------------------------------------------
@@ -57,11 +59,12 @@ class AdapterFactory
 
 		// create the adapter instance
 		$providerInstance = new $providerClassName(
-			$id, 
-			$this->hybridauthConfig, 
+			$id,
+			$this->hybridauthConfig,
 			$config,
 			$parameters,
-			$this->storage
+			$this->storage,
+			$this->cache
 		);
 
 		return $providerInstance;
