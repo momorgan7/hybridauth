@@ -31,10 +31,6 @@ class Request
 			$uri = $uri . ( strpos( $uri, '?' ) ? '&' : '?' ) . http_build_query( $args );
 		}
 
-		if( ($method == self::POST || $method==self::PUT) && ! isset( $headers['Content-type'] ) ) {
-			$headers['Content-type'] = 'Content-type: application/x-www-form-urlencoded';
-		}
-
 		$ch = curl_init();
 
 		curl_setopt( $ch, CURLOPT_URL            , $uri );
@@ -65,13 +61,12 @@ class Request
 
 		if( $method == self::POST ){
 			curl_setopt( $ch, CURLOPT_POST, 1);
-
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, http_build_query( $args ) );
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, $args );
 		}
 
 		if($method == self::PUT) {
 			curl_setopt($ch, CURLOPT_PUT, true);
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, http_build_query( $args ) );
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, $args );
 		}
 
 		if($method == self::DELETE ){
