@@ -21,6 +21,7 @@ class Event extends \Hybridauth\Entity\Entity
     protected $ticketURI   = null;
     protected $venue       = null;
     protected $privacy     = self::PRIVACY_OPEN;
+    protected $image       = null;
 
     function getDate() {
         return $this->date;
@@ -84,6 +85,10 @@ class Event extends \Hybridauth\Entity\Entity
 
     function getVenue() {
         return $this->venue;
+    }
+
+    function getImage() {
+        return $this->image;
     }
 
     function setDate($date) {
@@ -162,6 +167,13 @@ class Event extends \Hybridauth\Entity\Entity
         $this->privacy = $privacy;
     }
 
+    function attachImage($file) {
+        if(!is_readable($file)) {
+            return false;
+        }
+        $this->file = realpath($file);
+    }
+
     private function getOrCreateVenue() {
         if(is_null($this->venue)) {
             $this->venue = new Place($this->getAdapter());
@@ -208,6 +220,9 @@ class Event extends \Hybridauth\Entity\Entity
         if(!is_null($x = $event->getLocation()))    $return['location']     = $x;
         if(!is_null($x = $event->getTicketURI()))   $return['ticket_uri']   = $x;//only valid for page events
         if(!is_null($x = $event->getPrivacy()))     $return['privacy_type']   = $x;//only valid for personal events
+        if(!is_null($x = $event->getImage())) {
+            $return['event_image.jpg'] = '@' . $x;
+        }
         if(is_object($venue = $event->getVenue())) {
             if(!is_null($x = $venue->getIdentifier())) {
                 $return['location_id'] = $x;
