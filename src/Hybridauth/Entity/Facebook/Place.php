@@ -3,7 +3,7 @@ namespace Hybridauth\Entity\Facebook;
 
 use \Hybridauth\Http\Request;
 
-class Venue extends \Hybridauth\Entity\Entity
+class Place extends Page
 {
     protected $street = null;
     protected $city = null;
@@ -49,7 +49,7 @@ class Venue extends \Hybridauth\Entity\Entity
         $this->city = $city;
     }
 
-    function getState($state) {
+    function setState($state) {
         $this->state = $state;
     }
 

@@ -2,7 +2,7 @@
 namespace Hybridauth\Entity\Facebook;
 
 use \Hybridauth\Http\Request;
-use \Hybridauth\Entity\Facebook\Venue;
+use \Hybridauth\Entity\Facebook\Place;
 
 class Event extends \Hybridauth\Entity\Entity
 {
@@ -116,7 +116,7 @@ class Event extends \Hybridauth\Entity\Entity
     }
 
     function setState($state) {
-        $this->getOrCreateVenue()->setStreet($state);
+        $this->getOrCreateVenue()->setState($state);
     }
 
     function setZip($zip) {
@@ -145,7 +145,7 @@ class Event extends \Hybridauth\Entity\Entity
 
     private function getOrCreateVenue() {
         if(is_null($this->venue)) {
-            $this->venue = new Venue($this->getAdapter());
+            $this->venue = new Place($this->getAdapter());
         }
         return $this->venue;
     }
@@ -174,7 +174,7 @@ class Event extends \Hybridauth\Entity\Entity
         $event->setLocation    ( static::parser( 'location',$response )    );
         $event->setTicketURI   ( static::parser( 'ticket_uri',$response )  );
         if(property_exists($response, 'venue')) {
-            $event->venue = Venue::generateFromResponse($response->venue,$adapter);
+            $event->venue = Place::generateFromResponse($response->venue,$adapter);
         }
         return $event;
     }
@@ -186,8 +186,12 @@ class Event extends \Hybridauth\Entity\Entity
         if(!is_null($x = $event->getStartTime()))   $return['start_time']   = static::formatDate($x);
         if(!is_null($x = $event->getEndTime()))     $return['end_time']     = static::formatDate($x);
         if(!is_null($x = $event->getLocation()))    $return['location']     = $x;
-        if(!is_null($x = $event->getVenue()))       $return['venue']        = $x->generatePostData();
         if(!is_null($x = $event->getTicketURI()))   $return['ticket_uri']   = $x;
+        if(is_object($venue = $event->getVenue())) {
+            if(!is_null($x = $venue->getIdentifier())) {
+                $return['location_id'] = $x;
+            }
+        }
         return $return;
     }
 }
