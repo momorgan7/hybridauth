@@ -66,13 +66,14 @@ final class Hybridauth
 {
 	protected $config  = array();
 	protected $storage = null;
+	protected $cache = null;
 
 	// --------------------------------------------------------------------
 
 	/**
 	* Initialize HybridAuth. ...
 	*/
-	function __construct( $config = null, StorageInterface $storage = null )
+	function __construct( $config = null, StorageInterface $storage = null, StorageInterface $cache = null )
 	{
 		// set config
 		$this->config = $config;
@@ -83,6 +84,7 @@ final class Hybridauth
 
 		// setup storage manager
 		$this->storage = $storage ? $storage : new Session();
+		$this->cache = $cache;
 
 		// checks for errors
 		if( $this->storage->get( "error.status" ) ){

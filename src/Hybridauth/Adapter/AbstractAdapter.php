@@ -20,6 +20,7 @@ abstract class AbstractAdapter
 
 	protected $hybridauthEndpoint = null;
 	protected $storage            = null;
+	protected $cache            = null;
 
 	// --------------------------------------------------------------------
 
@@ -31,7 +32,8 @@ abstract class AbstractAdapter
 		$hybridauthConfig,
 		$config,
 		$parameters = null,
-		StorageInterface $storage = null
+		StorageInterface $storage = null,
+		StorageInterface $cache = null
 	)
 	{
 		$this->storage = $storage;
@@ -673,6 +675,22 @@ abstract class AbstractAdapter
 
 		return $result;
 	}
+
+	function getCacheRequest($uri,$ids,$value) {
+		if(is_null($this->cache)) return null;
+		return $this->cache->get(static::cacheKey($uri,$ids));
+	}
+
+	function setCacheRequest($uri,$ids,$value) {
+		if(is_null($this->cache)) return;
+		$this->cache->set(static::cacheKey($uri,$ids),$value);
+		return;
+	}
+
+	protected static function cacheKey($uri,$ids) {
+		return $uri.implode(':',$ids);
+	}
+
 
 	// --------------------------------------------------------------------
 

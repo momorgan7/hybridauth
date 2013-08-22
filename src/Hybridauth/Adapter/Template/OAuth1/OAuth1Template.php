@@ -226,8 +226,16 @@ class OAuth1Template extends AbstractAdapter implements AdapterInterface
 		$request->sign_request( $oauthLibSha1Method, $oauthLibConsumer, $oauthLibTokens );
 
 		switch ($method) {
-			case   'GET': $this->httpClient->get ( $request->to_url() ); break;
-			case 'POST' : $this->httpClient->post( $request->get_normalized_http_url(), $request->get_postdata(), $request->to_header() ) ; break;
+			case Request::GET:
+				$cache = $this->getCacheRequest($uri,array($oauthLibConsumer->__toString(),$oauthLibTokens->__toString()));
+				if(!is_null($cache)) {
+					$this->httpClient->setResponse($cache);
+				} else {
+					$this->httpClient->get ( $request->to_url() );
+					$this->setCacheResponse($uri, array($oauthLibConsumer->__toString(),$oauthLibTokens->__toString()), $this->httpClient->getResponse());
+				}
+				break;
+			case Request::POST : $this->httpClient->post( $request->get_normalized_http_url(), $request->get_postdata(), $request->to_header() ) ; break;
 		}
 
 		return $this->httpClient->getResponseBody();
