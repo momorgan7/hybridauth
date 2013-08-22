@@ -59,13 +59,8 @@ class Request
 			curl_setopt( $ch, CURLOPT_HTTPHEADER, $headers );
 		}
 
-		if( $method == self::POST ){
-			curl_setopt( $ch, CURLOPT_POST, 1);
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, $args );
-		}
-
-		if($method == self::PUT) {
-			curl_setopt($ch, CURLOPT_PUT, true);
+		if( $method == self::POST || $method == self::PUT){
+			curl_setopt( $ch, $method == self::POST ? CURLOPT_POST : CURLOPT_PUT, 1);
 			curl_setopt( $ch, CURLOPT_POSTFIELDS, $args );
 		}
 
