@@ -232,7 +232,7 @@ class OAuth1Template extends AbstractAdapter implements AdapterInterface
 					$this->httpClient->setResponse($cache);
 				} else {
 					$this->httpClient->get ( $request->to_url() );
-					$this->setCacheResponse($uri, array($oauthLibConsumer->__toString(),$oauthLibTokens->__toString()), $this->httpClient->getResponse());
+					$this->setCacheRequest($uri, array($oauthLibConsumer->__toString(),$oauthLibTokens->__toString()), $this->httpClient->getResponse());
 				}
 				break;
 			case Request::POST : $this->httpClient->post( $request->get_normalized_http_url(), $request->get_postdata(), $request->to_header() ) ; break;
