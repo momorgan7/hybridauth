@@ -73,7 +73,7 @@ final class Hybridauth
 	/**
 	* Initialize HybridAuth. ...
 	*/
-	function __construct( $config = null, StorageInterface $storage = null, StorageInterface $cache = null )
+	function __construct( $config = null, StorageInterface $storage = null)
 	{
 		// set config
 		$this->config = $config;
@@ -84,7 +84,11 @@ final class Hybridauth
 
 		// setup storage manager
 		$this->storage = $storage ? $storage : new Session();
-		$this->cache = $cache;
+		if(!empty($this->config['cache'])) {
+			$cacheClass = $this->config['cache']['class'];
+			$this->cache = new $cacheClass($this->config['cache']['argument']);
+			if(!is_a($this->cache,'StorageInterface')) throw new Exception('Cache not an instance of StorageInterface');
+		}
 
 		// checks for errors
 		if( $this->storage->get( "error.status" ) ){
@@ -128,7 +132,7 @@ final class Hybridauth
 	*/
 	function getAdapter( $providerId = null )
 	{
-		$adapterFactory = new AdapterFactory( $this->config, $this->storage );
+		$adapterFactory = new AdapterFactory( $this->config, $this->storage, $this->cache );
 
 		return $adapterFactory->setup( $providerId );
 	}
