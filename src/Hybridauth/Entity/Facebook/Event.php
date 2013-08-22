@@ -3,17 +3,24 @@ namespace Hybridauth\Entity\Facebook;
 
 use \Hybridauth\Http\Request;
 use \Hybridauth\Entity\Facebook\Place;
+use Hybridauth\Exception;
 
 class Event extends \Hybridauth\Entity\Entity
 {
-    protected $date = null;
-    protected $name = null;
+    const PRIVACY_OPEN    = 'OPEN';
+    const PRIVACY_CLOSED  = 'SECRET';
+    const PRIVACY_FRIENDS = 'FRIENDS';
+    const PRIVACY_CLOSED_DEPRICATED = 'CLOSED';
+
+    protected $date        = null;
+    protected $name        = null;
     protected $description = null;
-    protected $start_time = null;
-    protected $end_time = null;
-    protected $location = null;
-    protected $ticketURI = null;
-    protected $venue = null;
+    protected $start_time  = null;
+    protected $end_time    = null;
+    protected $location    = null;
+    protected $ticketURI   = null;
+    protected $venue       = null;
+    protected $privacy     = self::PRIVACY_OPEN;
 
     function getDate() {
         return $this->date;
@@ -37,6 +44,10 @@ class Event extends \Hybridauth\Entity\Entity
 
     function getLocation() {
         return $this->location;
+    }
+
+    function getPrivacy() {
+        return $this->privacy;
     }
 
     function getStreet() {
@@ -143,6 +154,14 @@ class Event extends \Hybridauth\Entity\Entity
         $this->venue = $venue;
     }
 
+    function setPrivacy($privacy) {
+        $valid_privacy = array(self::PRIVACY_OPEN => 1, self::PRIVACY_FRIENDS => 1, self::PRIVACY_CLOSED => 1, self::PRIVACY_CLOSED_DEPRICATED => 1);
+        if(!is_null($privacy) && !isset($valid_privacy[$privacy])) {
+            throw new Exception('Invalid privacy option passed to setPrivacy', Exception::UNSPECIFIED_ERROR, $privacy);
+        }
+        $this->privacy = $privacy;
+    }
+
     private function getOrCreateVenue() {
         if(is_null($this->venue)) {
             $this->venue = new Place($this->getAdapter());
@@ -173,8 +192,9 @@ class Event extends \Hybridauth\Entity\Entity
         $event->setEndTime     ( static::parser( 'end_time',$response )    );
         $event->setLocation    ( static::parser( 'location',$response )    );
         $event->setTicketURI   ( static::parser( 'ticket_uri',$response )  );
-        if(property_exists($response, 'venue')) {
-            $event->venue = Place::generateFromResponse($response->venue,$adapter);
+        $event->setPrivacy     ( static::parser( 'privacy', $response )    );
+        if($venue = static::parser('venue',$response)) {
+            $event->venue = Place::generateFromResponse($venue,$adapter);
         }
         return $event;
     }
@@ -186,7 +206,8 @@ class Event extends \Hybridauth\Entity\Entity
         if(!is_null($x = $event->getStartTime()))   $return['start_time']   = static::formatDate($x);
         if(!is_null($x = $event->getEndTime()))     $return['end_time']     = static::formatDate($x);
         if(!is_null($x = $event->getLocation()))    $return['location']     = $x;
-        if(!is_null($x = $event->getTicketURI()))   $return['ticket_uri']   = $x;
+        if(!is_null($x = $event->getTicketURI()))   $return['ticket_uri']   = $x;//only valid for page events
+        if(!is_null($x = $event->getPrivacy()))     $return['privacy_type']   = $x;//only valid for personal events
         if(is_object($venue = $event->getVenue())) {
             if(!is_null($x = $venue->getIdentifier())) {
                 $return['location_id'] = $x;
