@@ -289,6 +289,14 @@ class OAuth2Template extends AbstractAdapter implements AdapterInterface
 			case Request::DELETE : $this->httpClient->delete ( $uri, $parameters ); break;
 		}
 
+		switch($method) {
+			case Request::POST   :
+			case Request::PUT    :
+			case Request::DELETE :
+				$this->uncacheRequest($uri,array($parameters['access_token']));
+				break;
+		}
+
 		return $this->httpClient->getResponseBody();
 	}
 }

@@ -227,6 +227,7 @@ class OAuth1Template extends AbstractAdapter implements AdapterInterface
 
 		switch ($method) {
 			case Request::GET:
+				//This probably belongs at the httpClient level, however we are in a unique position where we know what params are identifying to the user(and which aren't, ie nonce and timestamp)
 				$cache = $this->getCacheRequest($uri,array($oauthLibConsumer->__toString(),$oauthLibTokens->__toString()));
 				if(!is_null($cache)) {
 					$this->httpClient->setResponse($cache);
@@ -236,6 +237,14 @@ class OAuth1Template extends AbstractAdapter implements AdapterInterface
 				}
 				break;
 			case Request::POST : $this->httpClient->post( $request->get_normalized_http_url(), $request->get_postdata(), $request->to_header() ) ; break;
+		}
+
+		switch($method) {
+			case Request::POST   :
+			case Request::PUT    :
+			case Request::DELETE :
+				$this->uncacheRequest($uri,array($oauthLibConsumer->__toString(),$oauthLibTokens->__toString()));
+				break;
 		}
 
 		return $this->httpClient->getResponseBody();
