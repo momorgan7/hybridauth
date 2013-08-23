@@ -9,6 +9,7 @@ namespace Hybridauth\Adapter\Template\OAuth1;
 
 use Hybridauth\Exception;
 use Hybridauth\Http\Util;
+use Hybridauth\Http\Request;
 use Hybridauth\Http\Client;
 
 use Hybridauth\Adapter\AbstractAdapter;
