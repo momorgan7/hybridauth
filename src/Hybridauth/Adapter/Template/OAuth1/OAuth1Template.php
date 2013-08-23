@@ -244,7 +244,7 @@ class OAuth1Template extends AbstractAdapter implements AdapterInterface
 			case Request::POST   :
 			case Request::PUT    :
 			case Request::DELETE :
-				$this->uncacheRequest($uri,array($oauthLibConsumer->__toString(),$oauthLibTokens->__toString()));
+				$this->uncacheRequest($uri,array(is_null($oauthLibConsumer) ? $oauthLibConsumer->__toString() : null,is_null($oauthLibTokens) ? $oauthLibTokens->__toString() : null));
 				break;
 		}
 
