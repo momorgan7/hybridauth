@@ -229,12 +229,12 @@ class OAuth1Template extends AbstractAdapter implements AdapterInterface
 		switch ($method) {
 			case Request::GET:
 				//This probably belongs at the httpClient level, however we are in a unique position where we know what params are identifying to the user(and which aren't, ie nonce and timestamp)
-				$cache = $this->getCacheRequest($uri,array($oauthLibConsumer->__toString(),$oauthLibTokens->__toString()));
+				$cache = $this->getCacheRequest($uri,array(is_object($oauthLibConsumer) ? $oauthLibConsumer->__toString() : null,is_object($oauthLibTokens) ? $oauthLibTokens->__toString() : null));
 				if(!is_null($cache)) {
 					$this->httpClient->setResponse($cache);
 				} else {
 					$this->httpClient->get ( $request->to_url() );
-					$this->setCacheRequest($uri, array($oauthLibConsumer->__toString(),$oauthLibTokens->__toString()), $this->httpClient->getResponse());
+					$this->setCacheRequest($uri, array(is_object($oauthLibConsumer) ? $oauthLibConsumer->__toString() : null,is_object($oauthLibTokens) ? $oauthLibTokens->__toString() : null), $this->httpClient->getResponse());
 				}
 				break;
 			case Request::POST : $this->httpClient->post( $request->get_normalized_http_url(), $request->get_postdata(), $request->to_header() ) ; break;
@@ -244,7 +244,7 @@ class OAuth1Template extends AbstractAdapter implements AdapterInterface
 			case Request::POST   :
 			case Request::PUT    :
 			case Request::DELETE :
-				$this->uncacheRequest($uri,array(is_null($oauthLibConsumer) ? $oauthLibConsumer->__toString() : null,is_null($oauthLibTokens) ? $oauthLibTokens->__toString() : null));
+				$this->uncacheRequest($uri,array(is_object($oauthLibConsumer) ? $oauthLibConsumer->__toString() : null,is_object($oauthLibTokens) ? $oauthLibTokens->__toString() : null));
 				break;
 		}
 
