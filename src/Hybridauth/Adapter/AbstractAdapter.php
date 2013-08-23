@@ -676,7 +676,7 @@ abstract class AbstractAdapter
 		return $result;
 	}
 
-	function getCacheRequest($uri,$ids,$value) {
+	function getCacheRequest($uri,$ids) {
 		if(is_null($this->cache)) return null;
 		return $this->cache->get(static::cacheKey($uri,$ids));
 	}
