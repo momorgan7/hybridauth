@@ -86,7 +86,7 @@ final class Hybridauth
 		$this->storage = $storage ? $storage : new Session();
 		if(!empty($this->config['cache'])) {
 			$cacheClass = $this->config['cache']['class'];
-			$this->cache = new $cacheClass($this->config['cache']['argument']);
+			$this->cache = new $cacheClass(isset($this->config['cache']['argument']) ? $this->config['cache']['argument'] : null);
 			if(!is_a($this->cache,'\Hybridauth\Storage\StorageInterface')) throw new Exception('Cache not an instance of StorageInterface');
 		}
 
