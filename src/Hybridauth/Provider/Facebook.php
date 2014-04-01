@@ -210,15 +210,32 @@ class Facebook extends OAuth2Template
 
 	/**
 	* Updates user status
-	*
-	* Examples:
-	*
-	*	$data = $hybridauth->authenticate( "Facebook" )->setUserStatus( _STATUS_ );
-	*
-	*	$data = $hybridauth->authenticate( "Facebook" )->setUserStatus( _PARAMS_ );
 	*/
-	function setUserStatus( $status )
-	{
-		throw new Exception( "Unsupported", Exception::UNSUPPORTED_FEATURE, null, $this );
+
+	function setUserStatus( $status ) {
+
+		$parameters = array();
+
+		if (is_array($status)) {
+			$parameters = $status;
+		}
+		else {
+			$parameters["message"] = $status;
+		}
+
+		try {
+
+			$response = $this->signedRequest('/me/feed', Request::POST, $parameters);
+			$response = json_decode($response);
+
+			if (!isset($response->id)) {
+				return false;
+			} else {
+				return true;
+			}
+
+		} catch (Exception $e) {
+			throw new Exception( "Update user status failed!", Exception::USER_UPDATE_STATUS_FAILED, null, $this );
+		}
  	}
 }
