@@ -20,6 +20,7 @@ class Exception extends \Exception
 	const UNSUPPORTED_FEATURE              = 8;
 	const USER_CONTACTS_REQUEST_FAILED     = 9;
 	const USER_UPDATE_STATUS_FAILED        = 10;
+	const USER_TWEETS_REQUEST_FAILED	   = 11;
 
 	// --------------------------------------------------------------------
 
@@ -45,7 +46,7 @@ class Exception extends \Exception
 		$file    = $this->getFile ();
 		$line    = $this->getLine ();
 		$trace   = $this->getTraceAsString ();
-		
+
 		$html  = sprintf ( '<h1>%s</h1>', $title );
 		$html .= '<p>Hybridauth could not run because of the following error:</p>';
 		$html .= '<h2>Details</h2>';
@@ -82,7 +83,7 @@ class Exception extends \Exception
 
 		$html .= '<h2>Session</h2>';
 		$html .= sprintf ( '<pre>%s</pre>', print_r ( $_SESSION, true ) );
-		
+
 		return sprintf ( "<html><head><title>%s</title><style>body{margin:0;padding:30px;font:12px/1.5 Helvetica,Arial,Verdana,sans-serif;}h1{margin:0;font-size:48px;font-weight:normal;line-height:48px;}strong{display:inline-block;width:65px;}</style></head><body>%s</body></html>", $title, $html );
 	}
 }

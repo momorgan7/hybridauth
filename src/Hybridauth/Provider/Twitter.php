@@ -72,13 +72,29 @@ class Twitter extends OAuth1Template
 	// --------------------------------------------------------------------
 
 	/**
-	* Returns user contacts list
+	* Returns tweets by user $username
 	*/
-	function getUserContacts()
+	function getTweetsByUser($username)
 	{
-		/// ToDo
 
-		throw new Exception( "Unsupported", Exception::UNSUPPORTED_FEATURE, null, $this );
+		$params = array(
+			'screen_name' => $username
+		);
+
+		$response = $this->signedRequest('statuses/user_timeline.json', Request::GET, $params);
+		$response = json_decode($response);
+
+		if (isset($response->error)) {
+			throw new
+				Exception(
+					'Get tweets by user request failed: Provider returned an invalid response. ' .
+					'HTTP client state: (' . $this->httpClient->getState() . ')',
+					Exception::USER_TWEETS_REQUEST_FAILED,
+					$this
+				);
+		}
+
+		return $response;
 	}
 
 	// --------------------------------------------------------------------
