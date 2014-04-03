@@ -87,6 +87,32 @@ class Profile extends Entity
 		return json_encode( get_class_vars( __CLASS__ ) ) ;
 	}
 
+	function extract() {
+		return array(
+            'website_url'        => $this->getWebSiteURL(),
+            'profile_url'        => $this->getProfileURL(),
+            'photo_url'          => $this->getPhotoURL(),
+            'display_name'       => $this->getDisplayName(),
+            'description'        => $this->getDescription(),
+            'first_name'         => $this->getFirstName(),
+            'last_name'          => $this->getLastName(),
+            'gender'             => $this->getGender(),
+            'language'           => $this->getLanguage(),
+            'age'                => $this->getAge(),
+            'birth_day'          => $this->getBirthDay(),
+            'birth_month'        => $this->getBirthMonth(),
+            'birth_year'         => $this->getBirthYear(),
+            'email'              => $this->getEmail(),
+            'email_verified'     => $this->getEmailVerified(),
+            'phone'              => $this->getPhone(),
+            'address'            => $this->getAddress(),
+            'country'            => $this->getCountry(),
+            'region'             => $this->getRegion(),
+            'city'               => $this->getCity(),
+            'zip'                => $this->getZip()
+        );
+	}
+
 	// --------------------------------------------------------------------
 
 
