@@ -21,6 +21,7 @@ class Exception extends \Exception
 	const USER_CONTACTS_REQUEST_FAILED     = 9;
 	const USER_UPDATE_STATUS_FAILED        = 10;
 	const USER_TWEETS_REQUEST_FAILED	   = 11;
+	const SEARCH_TWEETS_REQUEST_FAILED	   = 12;
 
 	// --------------------------------------------------------------------
 

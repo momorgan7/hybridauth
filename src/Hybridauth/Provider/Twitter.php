@@ -71,7 +71,7 @@ class Twitter extends OAuth1Template
 	function getUserProfile()
 	{
 		$response = $this->signedRequest( 'account/verify_credentials.json' );
-		$response = json_decode ( $response );
+		$response = json_decode( $response );
 
 		if ( ! isset( $response->id ) || isset ( $response->error ) ){
 			throw new
@@ -88,14 +88,62 @@ class Twitter extends OAuth1Template
 
 	// --------------------------------------------------------------------
 
+	function toSearchQuery($term) {
+
+		$term = str_replace(" ", "+", $term);
+		$term = str_replace("#", "%23", $term);
+		$term = str_replace("@", "%40", $term);
+
+		return $term;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	* Return tweets filtered by search term $term.
+	* Accepts search $term or array of optional params.
+	*
+	* See https://dev.twitter.com/docs/api/1.1/get/search/tweets for optional params.
+	*/
+	function searchTweets($term_or_params)
+	{
+
+		$params = array();
+
+		if (is_array($term_or_params)) {
+			$params = $term_or_params;
+		} else {
+			$params["q"] = $term_or_params;
+		}
+
+		// we need to properly format the $term
+		$params["q"] = $this->toSearchQuery($params["q"]);
+
+		$response = $this->signedRequest('search/tweets.json', Request::GET, $params);
+		$response = json_decode($response);
+
+		if (isset($response->error) || isset($response->errors)) {
+			throw new
+				Exception(
+					'Search tweets request failed: Provider returned an invalid response. ' .
+					'HTTP client state: (' . $this->httpClient->getState() . ')',
+					Exception::SEARCH_TWEETS_REQUEST_FAILED,
+					$this
+				);
+		}
+
+		return $this->parseTweets($response->statuses);
+	}
+
+	// --------------------------------------------------------------------
+
 	/**
 	* Returns tweets by user $username.
 	* Accepts username or array of optional params.
 	*
 	* See https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline for optional params.
 	*/
-	function getTweetsByUser($username_or_params)
-	{
+	function getTweetsByUser($username_or_params) {
 
 		$params = array();
 
@@ -108,7 +156,7 @@ class Twitter extends OAuth1Template
 		$response = $this->signedRequest('statuses/user_timeline.json', Request::GET, $params);
 		$response = json_decode($response);
 
-		if (isset($response->error)) {
+		if (isset($response->error) || isset($response->errors)) {
 			throw new
 				Exception(
 					'Get tweets by user request failed: Provider returned an invalid response. ' .
@@ -126,10 +174,9 @@ class Twitter extends OAuth1Template
 	/**
 	* Updates user status
 	*/
-	function setUserStatus( &$post )
-	{
+	function setUserStatus( &$post ) {
 		$uri = 'statuses/update.json';
-		if(is_string($post)) {
+		if (is_string($post)) {
 			$p = new Post($this);
 			$p->setMessage($post);
 			$post = $p;
