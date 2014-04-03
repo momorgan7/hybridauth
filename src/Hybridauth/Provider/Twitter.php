@@ -45,6 +45,23 @@ class Twitter extends OAuth1Template
 	// --------------------------------------------------------------------
 
 	/**
+	* Returns array of Post Entities
+	*
+	*/
+
+	function parseTweets($raw_tweets) {
+		$tweets = array();
+
+		foreach ($raw_tweets as $tweet) {
+			$tweets[] = Post::generateFromResponse($tweet, $this);
+		}
+
+		return $tweets;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	* Returns user profile
 	*
 	* Examples:
@@ -72,14 +89,21 @@ class Twitter extends OAuth1Template
 	// --------------------------------------------------------------------
 
 	/**
-	* Returns tweets by user $username
+	* Returns tweets by user $username.
+	* Accepts username or array of optional params.
+	*
+	* See https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline for optional params.
 	*/
-	function getTweetsByUser($username)
+	function getTweetsByUser($username_or_params)
 	{
 
-		$params = array(
-			'screen_name' => $username
-		);
+		$params = array();
+
+		if (is_array($username_or_params)) {
+			$params = $username_or_params;
+		} else {
+			$params["screen_name"] = $username_or_params;
+		}
 
 		$response = $this->signedRequest('statuses/user_timeline.json', Request::GET, $params);
 		$response = json_decode($response);
@@ -94,7 +118,7 @@ class Twitter extends OAuth1Template
 				);
 		}
 
-		return $response;
+		return $this->parseTweets($response);
 	}
 
 	// --------------------------------------------------------------------
