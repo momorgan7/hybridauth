@@ -28,7 +28,7 @@
 *			->process();
 */
 
-require_once( 'HybridAuth/Hybridauth.php' );
+require_once( 'Hybridauth/Hybridauth.php' );
 
 \Hybridauth\Hybridauth::registerAutoloader();
 
