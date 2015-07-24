@@ -238,4 +238,30 @@ class Facebook extends OAuth2Template
 			throw new Exception( "Update user status failed!", Exception::USER_UPDATE_STATUS_FAILED, null, $this );
 		}
  	}
+
+	function addUserPhoto( $url ) {
+		$parameters = array();
+
+		if (is_array($url)) {
+			$parameters = $url;
+		}
+		else {
+			$parameters["url"] = $url;
+		}
+
+		try {
+
+			$response = $this->signedRequest('/me/photos', Request::POST, array());
+			$response = json_decode($response);
+
+			if (!isset($response->id)) {
+				return false;
+			} else {
+				return true;
+			}
+
+		} catch (Exception $e) {
+			throw new Exception( "Update photo add failed!", Exception::USER_UPDATE_STATUS_FAILED, null, $this );
+		}
+	}
 }
