@@ -251,7 +251,7 @@ class Facebook extends OAuth2Template
 
 		try {
 
-			$response = $this->signedRequest('/me/photos', Request::POST, array());
+			$response = $this->signedRequest('/me/photos', Request::POST, $parameters);
 			$response = json_decode($response);
 
 			if (!isset($response->id)) {
