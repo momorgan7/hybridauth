@@ -195,13 +195,14 @@ class OAuth2Template extends AbstractAdapter implements AdapterInterface
 		}
 
 		// expired?
-		if( ! $force && $this->getTokens()->accessTokenExpiresIn > time() ){
+		if( ! $force && $this->getTokens()->accessTokenExpiresAt > time() ){
 			return false;
 		}
 
 		$defaults = array(
 			"client_id"     => $this->getApplicationId(),
 			"client_secret" => $this->getApplicationSecret(),
+			"refresh_token" => $this->getTokens()->refreshToken,
 			"grant_type"    => "refresh_token"
 		);
 
