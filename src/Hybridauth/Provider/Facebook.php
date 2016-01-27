@@ -264,4 +264,30 @@ class Facebook extends OAuth2Template
 			throw new Exception( "Update photo add failed!", Exception::USER_UPDATE_STATUS_FAILED, null, $this );
 		}
 	}
+
+   /**
+   * @return bool
+   * @param string $facebook_event_id
+   * @param string $rsvp attending|declined|maybe
+   */
+   function rsvp( $facebook_event_id, $rsvp = 'attending' ) {
+		switch ($rsvp) {
+			case 'attending':       $url = '/attending'; break;
+			case 'declined':        $url = '/declined'; break;
+			case 'maybe':           $url = '/maybe'; break;
+			default: throw new Exception("Invalid RSVP status indicated – Must be attending, declined, maybe");
+		}
+		try {
+			$response = $this->signedRequest( $facebook_event_id . $url, Request::POST, array() );
+			$response = json_decode($response);
+
+			if ($response !== true) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (Exception $e) {
+			throw new Exception( "Event RSVP failed!", Exception::USER_UPDATE_STATUS_FAILED, null, $this );
+		}
+	}
 }
