@@ -687,9 +687,9 @@ abstract class AbstractAdapter
 		return;
 	}
 
-	function uncacheRequest($uri,$ids,$value) {
+	function uncacheRequest($uri,$ids) {
 		if(is_null($this->cache)) return;
-		$this->cache->delete(static::cacheKey($uri,$ids),$value);
+		$this->cache->delete(static::cacheKey($uri,$ids));
 		return;
 	}
 
