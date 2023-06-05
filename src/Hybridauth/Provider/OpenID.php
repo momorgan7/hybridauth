@@ -28,8 +28,8 @@ class OpenID extends OpenIDTemplate
 	{
 		parent::initialize();
 
-		$identifier = $this->getAdapterConfig( 'openid_identifier' ) ? $this->getAdapterConfig( 'openid_identifier' ) 
-			: $this->getAdapterParameters( 'openid_identifier' ) ? $this->getAdapterParameters( 'openid_identifier' ) 
+		$identifier = ($this->getAdapterConfig( 'openid_identifier' ) ? $this->getAdapterConfig( 'openid_identifier' )
+			: $this->getAdapterParameters( 'openid_identifier' )) ? $this->getAdapterParameters( 'openid_identifier' )
 			: null;
 
 		$this->letOpenidIdentifier( $identifier );
